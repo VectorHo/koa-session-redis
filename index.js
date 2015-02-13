@@ -193,6 +193,7 @@ Session.prototype.del = function (sid) {
 Session.prototype.inspect =
   Session.prototype.toJSON = function () {
   var self = this;
+  delete self.client;
   var obj = {};
 
   Object.keys(this).forEach(function (key) {
@@ -215,7 +216,9 @@ Session.prototype.inspect =
 
 Session.prototype.changed = function (prev) {
   if (!prev) return true;
-  this._json = JSON.stringify(this);
+  var that = this;
+  delete that.client;
+  this._json = JSON.stringify(that);
   return this._json !== prev;
 };
 
@@ -250,8 +253,10 @@ Session.prototype.__defineGetter__('populated', function () {
  */
 
 Session.prototype.save = function () {
+  var that = this;
+  delete that.client;
   var ctx = this._ctx,
-      json = this._json || JSON.stringify(this),
+      json = this._json || JSON.stringify(that),
       sid = ctx.sessionId,
       opts = ctx.cookieOption,
       key = ctx.sessionKey;
