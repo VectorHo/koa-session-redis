@@ -1,4 +1,4 @@
-# koa-session-redis
+# koa-session-redis2
 
  Redis store-based session middleware for Koa. add hack: del sess by redis's client.  
 
