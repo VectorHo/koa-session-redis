@@ -9,7 +9,7 @@
 ## Installation
 
 ```js
-$ npm install koa-session-redis
+$ npm install koa-session-redis2
 ```
 
 ## Notice
