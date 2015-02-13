@@ -54,7 +54,7 @@ module.exports = function (opts) {
     debug('redis changed to db %d', redisOption.db);
   });
 
-  client.get = thunkify(client.get);
+  client.get = thunkify(client.get); // 普通回调转换成Generator接收的函数
   client.set = thunkify(client.set);
   client.del = thunkify(client.del);
   client.ttl = redisOption.ttl ? function expire(key) { client.expire(key, redisOption.ttl); }: function () {};
@@ -96,29 +96,29 @@ module.exports = function (opts) {
     if (sid) {
       debug('sid %s', sid);
       try {
-        json = yield client.get(sid);
+        json = yield client.get(sid); // 根据sid取出session数据
       }catch (e) {
         debug('encounter error %s', e);
         json = null;
       }
     }
 
-    if (json) {
+    if (json) { // 放入sess
       this.sessionId = sid;
       debug('parsing %s', json);
       try {
-        sess = new Session(this, JSON.parse(json));
+        sess = new Session(this, JSON.parse(json), client);
       } catch (err) {
         // backwards compatibility:
         // create a new session if parsing fails.
         // `JSON.parse(string)` will crash.
         if (!(err instanceof SyntaxError)) throw err;
-        sess = new Session(this);
+        sess = new Session(this, null, client);
       }
-    } else {
+    } else { // 创建一个sess
       sid = this.sessionId = uid(24);
       debug('new session');
-      sess = new Session(this);
+      sess = new Session(this, null, client);
     }
 
     this.__defineGetter__('session', function () {
@@ -135,8 +135,8 @@ module.exports = function (opts) {
     });
 
     try {
-      yield *next;
-    } catch (err) {
+      yield *next; // 把传入next函数指定为generator函数，就是一个generator里面嵌套一个generator
+    } catch (err) { // 捕获下游的异常
       throw err;
     } finally {
       if (undefined === sess) {
@@ -165,11 +165,23 @@ module.exports = function (opts) {
  * @api private
  */
 
-function Session(ctx, obj) {
+function Session(ctx, obj, client) {
   this._ctx = ctx;
   if (!obj) this.isNew = true;
   else for (var k in obj) this[k] = obj[k];
+  if(client) this.client = client; // hack
 }
+
+/**
+ * del redis's sess by other's sid
+ *
+ * @return {Object}
+ * @api public
+ */
+
+Session.prototype.del = function (sid) {
+  this.client.del(sid); // generator-base flow
+};
 
 /**
  * JSON representation of the session.
