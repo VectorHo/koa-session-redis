@@ -1,6 +1,6 @@
 # koa-session-redis
 
- Redis store-based session middleware for Koa.
+ Redis store-based session middleware for Koa. add hack: del sess by redis's client.  
 
  Based on [koa-session](https://github.com/koajs/session)
 
@@ -76,6 +76,14 @@ console.log('listening on port 3000');
 
 ```js
 this.session = null;
+```
+
+### Del somebody's session by sid
+
+  To del a session simple use redis's client.
+
+```js
+this.session.del(sid);
 ```
 
 ## License
