@@ -2,7 +2,7 @@
   "name": "koa-session-redis2",
   "description": "Koa redis session middleware",
   "repository": "VectorHo/koa-session-redis2",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "keywords": [
     "koa",
     "middleware",

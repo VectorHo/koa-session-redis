@@ -1,6 +1,7 @@
 # koa-session-redis2
 
- Redis store-based session middleware for Koa. add hack: del sess by redis's client.  
+ Redis store-based session middleware for Koa.
+ add hack: del sess by redis's client.  
 
  Based on [koa-session](https://github.com/koajs/session)
 
@@ -19,7 +20,7 @@ Set your redis connection configuration in options.store
   example (using redis without specific configuration)
 
 ```js
-var session = require('koa-session-redis');
+var session = require('koa-session-redis2');
 
 var koa = require('koa');
 var app = koa();
@@ -38,7 +39,9 @@ app.use(function *(){
   var n = this.session.views || 0;
   this.session.views = ++n;
   this.body = n + ' views';
-})
+});
+
+// then u can del pre user's sess. eg: this.sesseion.del(pre_sid);
 
 app.listen(3000);
 console.log('listening on port 3000');
